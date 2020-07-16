@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	 ======================================================================
+     flowmoney builder 4 product
+     ======================================================================
+-->
+
+<project name="agentweb2" default="pack">
+    <property name="tarForAgentApi2" value="./target/tarForAgentApi2"/>
+    <property name="classes" value="./target"/>
+    <property name="appName" value="agentApi2"/>
+    <property name="source" value="1.8"/>
+    <property name="target" value="1.8"/>
+    <property name="app.dir" value="."/>
+
+    <target name="init">
+        <tstamp>
+            <format property="TODAY" pattern="yyyyMMdd" locale="cn"/>
+        </tstamp>
+        <delete dir="${tarForAgentApi2}"/>
+        <mkdir dir="${tarForAgentApi2}"/>
+        <echo>${appName} ${TODAY}</echo>
+    </target>
+
+    <target name="packStatic" depends="init">
+        <tar destfile="${tarForAgentApi2}/${appName}-${TODAY}.tar">
+            <tarfileset dir="${classes}">
+
+                <include name="classes/com/eeepay/modules/controller/ProfitController*.class"/>
+                <include name="classes/com/eeepay/modules/service/ProfitService*.class"/>
+                <include name="classes/com/eeepay/modules/service/impl/ProfitServiceImpl*.class"/>
+                <include name="classes/com/eeepay/modules/dao/ProfitDao*.class"/>
+                <include name="classes/com/eeepay/frame/utils/swagger/SwaggerNoteLmc*.class"/>
+
+            </tarfileset>
+        </tar>
+    </target>
+
+    <target name="clean">
+        <delete dir="${tarForAgentApi2}"/>
+        <mkdir dir="${tarForAgentApi2}"/>
+    </target>
+
+    <target name="pack" depends="packStatic"/>
+
+    <target name="all" depends="clean, packStatic"/>
+</project>

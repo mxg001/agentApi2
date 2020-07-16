@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eeepay.modules.dao.ThreeDataDao">
+
+	<resultMap type="com.eeepay.modules.bean.ThreeDataCollect"
+		id="selectDetailByQoMap">
+		<result column="trans_sum" property="transSum"
+			jdbcType="VARCHAR" />
+		<result column="merchant_sum" property="merchantSum"
+			jdbcType="VARCHAR" />
+		<result column="activated_merchant_sum"
+			property="activatedMerchantSum" jdbcType="VARCHAR" />
+		<result column="create_time_str" property="lastUpdateTime"
+			jdbcType="VARCHAR" />
+		<result column="terminal_sum" property="terminalSum"
+			jdbcType="VARCHAR" />
+
+	</resultMap>
+
+	<resultMap type="com.eeepay.modules.bean.ThreeDataCollect"
+		id="countThreeDataCollectMap">
+		<result column="trans_sum" property="transSum"
+			jdbcType="VARCHAR" />
+		<result column="merchant_sum" property="merchantSum"
+			jdbcType="VARCHAR" />
+		<result column="activated_merchant_sum"
+			property="activatedMerchantSum" jdbcType="VARCHAR" />
+
+	</resultMap>
+	
+	<resultMap type="com.eeepay.modules.bean.ThreeDataCollect"
+		id="selectThreeDataCollectSectionByQoMap">
+		<result column="last_update_time" property="lastUpdateTime"
+			jdbcType="VARCHAR" />
+		<result column="terminal_sum" property="terminalSum"
+			jdbcType="VARCHAR" />
+
+	</resultMap>
+
+	<select id="countThreeDataCollect"
+		resultType="com.eeepay.modules.bean.ThreeDataCollect">
+
+		SELECT
+		sum( trade_sum ) AS trans_sum,
+		sum( mer_sum ) AS merchant_sum,
+		sum( activate_sum ) AS activated_merchant_sum
+		FROM
+		trade_sum_info
+		<where>
+			<if test="teamId != null and teamId != '' ">
+				AND team_id = #{teamId,jdbcType=VARCHAR}
+			</if>
+			<if test="agentNoList.size() > 0">
+				AND agent_no IN
+				<foreach collection="agentNoList" item="agentNo" open="("
+					separator="," close=")">
+					#{agentNo,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+		</where>
+
+	</select>
+
+	<select id="selectDetailByQo" resultMap="selectDetailByQoMap">
+		SELECT
+		t1.trans_sum AS trans_sum,
+		t1.merchant_sum AS merchant_sum,
+		t1.activated_merchant_sum AS activated_merchant_sum,
+		CONCAT(SUBSTR(t1.create_time_str, 5, 2),'月',SUBSTR(t1.create_time_str, 7, 2),'日') AS create_time_str,
+		t2.machines_stock AS terminal_sum
+		FROM
+		(
+		SELECT
+		sum( trade_sum ) AS trans_sum,
+		sum( mer_sum ) AS merchant_sum,
+		sum( activate_sum ) AS activated_merchant_sum,
+		DATE_FORMAT(create_time, '%Y%m%d' ) AS create_time_str
+		FROM
+		trade_sum_info
+		<where>
+			<if test="teamId != null and teamId != '' ">
+				AND team_id = #{teamId,jdbcType=VARCHAR}
+			</if>
+			<if test="agentNoList.size() > 0">
+				AND agent_no IN
+				<foreach collection="agentNoList" item="agentNo" open="("
+					separator="," close=")">
+					#{agentNo,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+			<if test="yearMonth != null and yearMonth!='' ">
+				AND DATE_FORMAT(create_time, '%Y%m' ) =
+				#{yearMonth,jdbcType=VARCHAR}
+			</if>
+		</where>
+		GROUP BY
+		create_time_str
+		) t1
+		JOIN (
+		SELECT
+		sum( machines_stock ) AS machines_stock,
+		DATE_FORMAT(create_time, '%Y%m%d' ) AS create_time_str
+		FROM
+		trade_sum_info
+		<where>
+			<if test="teamId != null and teamId != '' ">
+				AND team_id = #{teamId,jdbcType=VARCHAR}
+			</if>
+			<if test="agentNoList.size() > 0">
+				AND agent_no IN
+				<foreach collection="agentNoList" item="agentNo" open="("
+					separator="," close=")">
+					#{agentNo,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+			<if test="yearMonth != null and yearMonth!='' ">
+				AND DATE_FORMAT(create_time, '%Y%m' ) =
+				#{yearMonth,jdbcType=VARCHAR}
+			</if>
+		</where>
+		GROUP BY
+		create_time_str
+		) t2 ON t1.create_time_str = t2.create_time_str
+		ORDER BY
+			t1.create_time_str DESC
+
+	</select>
+
+	<select id="countTerminalSumByAgentNoListAndTeamIdAndCreateTime"
+		resultType="String">
+		SELECT
+		sum( machines_stock )
+		FROM
+		trade_sum_info
+		<where>
+			<if test="teamId != null and teamId != '' ">
+				AND team_id = #{teamId,jdbcType=VARCHAR}
+			</if>
+			<if test="agentNoList.size() > 0">
+				AND agent_no IN
+				<foreach collection="agentNoList" item="agentNo" open="("
+					separator="," close=")">
+					#{agentNo,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+			AND DATE_FORMAT(create_time, '%Y%m%d' ) = DATE_FORMAT(#{date,jdbcType=TIMESTAMP}, '%Y%m%d' )
+		</where>
+
+	</select>
+
+	<select id="selectThreeDataCollectByQo"
+		resultMap="countThreeDataCollectMap">
+		SELECT
+		sum( trade_sum ) AS trans_sum,
+		sum( mer_sum ) AS merchant_sum,
+		sum( activate_sum ) AS activated_merchant_sum
+		FROM
+		trade_sum_info
+		<where>
+			<if test="teamId != null and teamId != '' ">
+				AND team_id = #{teamId,jdbcType=VARCHAR}
+			</if>
+			<if test="agentNoList.size() > 0">
+				AND agent_no IN
+				<foreach collection="agentNoList" item="agentNo" open="("
+					separator="," close=")">
+					#{agentNo,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+			<if test="yearMonth != null and yearMonth!='' ">
+				AND DATE_FORMAT(create_time, '%Y%m' ) =
+				#{yearMonth,jdbcType=VARCHAR}
+			</if>
+		</where>	
+		
+	</select>
+	
+	<select id="selectThreeDataCollectSectionByQo" resultMap="selectThreeDataCollectSectionByQoMap" >
+		SELECT
+			sum( machines_stock ) as terminal_sum,
+			DATE_FORMAT(create_time, '%Y年%m月' ) as last_update_time
+		FROM
+			trade_sum_info 
+		WHERE
+			DATE_FORMAT(create_time, '%Y%m%d' ) =
+				DATE_FORMAT( ( SELECT create_time FROM trade_sum_info
+			 <where>
+				<if test="yearMonth != null and yearMonth!='' ">
+					AND DATE_FORMAT(create_time, '%Y%m' ) =
+					#{yearMonth,jdbcType=VARCHAR}
+				</if>
+			</where>
+			 GROUP BY create_time ORDER BY create_time DESC LIMIT 1 ), '%Y%m%d' )
+			
+			<if test="teamId != null and teamId != '' ">
+				AND team_id = #{teamId,jdbcType=VARCHAR}
+			</if>
+			<if test="agentNoList.size() > 0">
+				AND agent_no IN
+				<foreach collection="agentNoList" item="agentNo" open="("
+					separator="," close=")">
+					#{agentNo,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+	</select>
+	
+</mapper>

@@ -1,0 +1,38 @@
+spring:
+    datasource:
+        write:
+            driver-class-name: com.mysql.jdbc.Driver
+            url: jdbc:mysql://119.23.245.114:5567/nposp?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&tinyInt1isBit=false&useSSL=false&useAffectedRows=true
+            username: ys_write
+            password: ys_cs@^%$123
+        read:
+            driver-class-name: com.mysql.jdbc.Driver
+            url: jdbc:mysql://119.23.245.114:5567/nposp?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=true&tinyInt1isBit=false&useSSL=false&useAffectedRows=true
+            username: ys_write
+            password: ys_cs@^%$123
+        bill:
+            driver-class-name: com.mysql.jdbc.Driver
+            url: jdbc:mysql://119.23.245.114:5567/bill?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=true&tinyInt1isBit=false&useSSL=false&useAffectedRows=true
+            username: cs_read
+            password: Cs_read$&^##0530
+    redis:
+        host: 120.78.82.29
+        port: 6689
+        password: EEEPAY(@#%&*<567>7483754.comadmincn
+        timeout: 1000
+        jedis:
+            pool:
+                max-idle: 5
+                min-idle: 0
+                max-active: 8
+                max-wait: -1
+
+    data:
+        elasticsearch:
+            cluster-name: elasticsearch
+            cluster-nodes: 47.112.7.252:9300
+            repositories:
+                enabled: true
+
+# 是否显示swagger接口文档
+show-api-doc: true
